@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export type UserId = {
-  user: string;
-  organiser: string;
-  admin: string;
-  owner: string;
+export const userId = {
+  user: "fake-user-id-1",
+  organiser: "fake-user-id-2",
+  admin: "fake-user-id-3",
+  owner: "fake-user-id-4",
 };
 
 export const uploadItems = async <T>(

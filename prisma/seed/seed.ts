@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { type UserId } from "./utils";
 
 import { uploadCompetitions } from "./data/competitions";
 import { uploadEntries } from "./data/entries";
@@ -14,21 +13,14 @@ import { uploadTeams } from "./data/teams";
 const prisma = new PrismaClient();
 
 async function main() {
-  const userId: UserId = {
-    user: "fake-user-id-1",
-    organiser: "fake-user-id-2",
-    admin: "fake-user-id-3",
-    owner: "fake-user-id-4",
-  };
-
-  await uploadRoles(prisma, userId);
+  await uploadRoles(prisma);
   await uploadTeams(prisma);
-  await uploadCompetitions(prisma, userId);
+  await uploadCompetitions(prisma);
   await uploadGroups(prisma);
   await uploadFixtures(prisma);
   await uploadOrganisations(prisma);
-  await uploadFundraisers(prisma, userId);
-  await uploadEntries(prisma, userId);
+  await uploadFundraisers(prisma);
+  await uploadEntries(prisma);
   await uploadPredictions(prisma);
 }
 

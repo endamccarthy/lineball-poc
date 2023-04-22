@@ -1,10 +1,10 @@
 import type { PrismaClient, Role } from "@prisma/client";
 import { AccessLevel } from "@prisma/client";
-import { type UserId, uploadItems } from "../utils";
+import { uploadItems, userId } from "../utils";
 
 export let roles: Role[];
 
-export async function uploadRoles(prisma: PrismaClient, userId: UserId) {
+export async function uploadRoles(prisma: PrismaClient) {
   const fakeData = [
     {
       userId: userId.user,

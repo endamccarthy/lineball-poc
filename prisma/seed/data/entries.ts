@@ -1,10 +1,10 @@
 import type { Entry, PrismaClient } from "@prisma/client";
-import { type UserId, uploadItems } from "../utils";
+import { uploadItems, userId } from "../utils";
 import { fundraisers } from "./fundraisers";
 
 export let entries: Entry[];
 
-export async function uploadEntries(prisma: PrismaClient, userId: UserId) {
+export async function uploadEntries(prisma: PrismaClient) {
   const fakeData = [
     {
       userId: userId.user,
