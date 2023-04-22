@@ -8,11 +8,16 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:reset": "prisma db push --force-reset",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed/seed.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.14.0",
-    "@prisma/client": "^4.11.0",
+    "@prisma/client": "^4.13.0",
     "@tanstack/react-query": "^4.28.0",
     "@trpc/client": "^10.18.0",
     "@trpc/next": "^10.18.0",
@@ -44,6 +49,7 @@
     "prettier-plugin-tailwindcss": "^0.2.6",
     "prisma": "^4.11.0",
     "tailwindcss": "^3.3.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.2"
   },
   "ct3aMetadata": {

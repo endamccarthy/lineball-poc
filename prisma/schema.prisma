@@ -11,8 +11,176 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
+enum AccessLevel {
+  USER
+  ORGANISER
+  ADMIN
+  OWNER
+}
+
+enum Result {
+  TEAM_A_WIN
+  TEAM_B_WIN
+  DRAW
+}
+
+enum Sport {
+  HURLING
+  FOOTBALL
+  SOCCER
+  RUGBY
+}
+
+// User models
+model Role {
+  id          Int         @id @default(autoincrement())
+  userId      String
+  accessLevel AccessLevel @default(USER)
+
+  organisations Organisation[]
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updateAt  DateTime @updatedAt
+
+  @@unique([userId])
+  @@index([userId])
+}
+
+model Team {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(50)
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  fixturesA Fixture[] @relation("teamA")
+  fixturesB Fixture[] @relation("teamB")
+}
+
+model Competition {
+  id        Int    @id @default(autoincrement())
+  creatorId String
+  name      String @db.VarChar(50)
+  year      Int    @db.Year
+  sport     Sport
+
+  fundraisers Fundraiser[]
+  fixtures    Fixture[]
+  groups      Group[]
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@unique([name, year])
+  @@index([creatorId])
+}
+
+model Group {
+  id          Int         @unique @default(autoincrement())
+  name        String      @db.VarChar(50)
+  competition Competition @relation(fields: [competitionId], references: [id])
+
+  competitionId Int
+
+  createdAt DateTime  @default(now())
+  updateAt  DateTime  @updatedAt
+  fixtures  Fixture[]
+
+  @@unique([name, competitionId])
+  @@index([competitionId])
+}
+
+model Fixture {
+  id          Int         @unique @default(autoincrement())
+  competition Competition @relation(fields: [competitionId], references: [id])
+  group       Group       @relation(fields: [groupId], references: [id])
+  round       Int         @default(1) @db.TinyInt
+  teamA       Team        @relation("teamA", fields: [teamAId], references: [id])
+  teamB       Team        @relation("teamB", fields: [teamBId], references: [id])
+  result      Result?
+
+  predictions Prediction[]
+
+  teamAId       Int
+  teamBId       Int
+  competitionId Int
+  groupId       Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@id([competitionId, round, teamAId, teamBId])
+  @@index([id])
+  @@index([competitionId])
+  @@index([teamBId])
+  @@index([teamAId])
+  @@index([groupId])
+}
+
+model Organisation {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(50)
+
+  roles       Role[]
+  fundraisers Fundraiser[]
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@index([name])
+}
+
+model Fundraiser {
+  id                Int          @id @default(autoincrement())
+  organiserId       String
+  socialMedia       String?      @db.VarChar(50)
+  secondSocialMedia String?      @db.VarChar(50)
+  verified          Boolean      @default(false)
+  competition       Competition  @relation(fields: [competitionId], references: [id])
+  organisation      Organisation @relation(fields: [organisationId], references: [id])
+
+  entries Entry[]
+
+  competitionId  Int
+  organisationId Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@index([organiserId])
+  @@index([competitionId])
+  @@index([organisationId])
+}
+
+model Entry {
+  id         Int        @id @default(autoincrement())
+  userId     String
+  fundraiser Fundraiser @relation(fields: [fundraiserId], references: [id])
+
+  predictions Prediction[]
+
+  fundraiserId Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@index([fundraiserId])
+}
+
+model Prediction {
+  id      Int     @id @default(autoincrement())
+  entry   Entry   @relation(fields: [entryId], references: [id])
+  fixture Fixture @relation(fields: [fixtureId], references: [id])
+  result  Result
+
+  entryId   Int
+  fixtureId Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@unique([entryId, fixtureId])
+  @@index([entryId])
+  @@index([fixtureId])
 }
