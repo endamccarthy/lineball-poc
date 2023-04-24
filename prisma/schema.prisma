@@ -31,7 +31,12 @@ enum Sport {
   RUGBY
 }
 
-// User models
+enum Platform {
+  FACEBOOK
+  INSTAGRAM
+  TWITTER
+}
+
 model Role {
   id          Int         @id @default(autoincrement())
   userId      String
@@ -50,29 +55,42 @@ model Team {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(50)
 
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
-
   fixturesA Fixture[] @relation("teamA")
   fixturesB Fixture[] @relation("teamB")
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model Scoring {
+  id            Int @id @default(autoincrement())
+  pointsForWin  Int @db.TinyInt
+  pointsForDraw Int @db.TinyInt
+
+  competitions Competition[]
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 }
 
 model Competition {
-  id        Int    @id @default(autoincrement())
-  creatorId String
-  name      String @db.VarChar(50)
-  year      Int    @db.Year
-  sport     Sport
+  id      Int     @id @default(autoincrement())
+  name    String  @db.VarChar(50)
+  year    Int     @db.Year
+  sport   Sport
+  scoring Scoring @relation(fields: [scoringId], references: [id])
 
   fundraisers Fundraiser[]
   fixtures    Fixture[]
   groups      Group[]
 
+  scoringId Int
+
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
   @@unique([name, year])
-  @@index([creatorId])
+  @@index([scoringId])
 }
 
 model Group {
@@ -80,11 +98,12 @@ model Group {
   name        String      @db.VarChar(50)
   competition Competition @relation(fields: [competitionId], references: [id])
 
+  fixtures Fixture[]
+
   competitionId Int
 
-  createdAt DateTime  @default(now())
-  updateAt  DateTime  @updatedAt
-  fixtures  Fixture[]
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
 
   @@unique([name, competitionId])
   @@index([competitionId])
@@ -117,10 +136,24 @@ model Fixture {
   @@index([groupId])
 }
 
+model Social {
+  id       Int      @id @default(autoincrement())
+  platform Platform
+  handle   String   @db.VarChar(50)
+
+  organisations Organisation[]
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@unique([platform, handle])
+}
+
 model Organisation {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(50)
 
+  socials     Social[]
   roles       Role[]
   fundraisers Fundraiser[]
 
@@ -131,15 +164,14 @@ model Organisation {
 }
 
 model Fundraiser {
-  id                Int          @id @default(autoincrement())
-  organiserId       String
-  socialMedia       String?      @db.VarChar(50)
-  secondSocialMedia String?      @db.VarChar(50)
-  verified          Boolean      @default(false)
-  competition       Competition  @relation(fields: [competitionId], references: [id])
-  organisation      Organisation @relation(fields: [organisationId], references: [id])
+  id           Int          @id @default(autoincrement())
+  organiserId  String
+  verified     Boolean      @default(false)
+  competition  Competition  @relation(fields: [competitionId], references: [id])
+  organisation Organisation @relation(fields: [organisationId], references: [id])
 
   entries Entry[]
+  prizes  Prize[]
 
   competitionId  Int
   organisationId Int
@@ -152,10 +184,27 @@ model Fundraiser {
   @@index([organisationId])
 }
 
+model Prize {
+  id          Int    @id @default(autoincrement())
+  place       Int    @db.TinyInt
+  description String @db.VarChar(50)
+
+  fundraiser Fundraiser @relation(fields: [fundraiserId], references: [id])
+
+  fundraiserId Int
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@unique([place, fundraiserId])
+  @@index([fundraiserId])
+}
+
 model Entry {
   id         Int        @id @default(autoincrement())
   userId     String
   fundraiser Fundraiser @relation(fields: [fundraiserId], references: [id])
+  points     Int        @default(0)
 
   predictions Prediction[]
 
