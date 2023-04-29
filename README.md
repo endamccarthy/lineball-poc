@@ -1,4 +1,4 @@
-Get Going:
+## Get Going
 
 - `p db:reset`
 - `p db:seed`
