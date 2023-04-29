@@ -1,8 +1,7 @@
 import type { Organisation, PrismaClient } from "@prisma/client";
-import { uploadItems } from "../utils";
 import { socials } from "./socials";
 
-export let organisations: Organisation[];
+export const organisations: Organisation[] = [];
 
 export async function uploadOrganisations(prisma: PrismaClient) {
   const fakeData = [
@@ -12,6 +11,12 @@ export async function uploadOrganisations(prisma: PrismaClient) {
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.organisation, fakeData);
-  organisations = uploadReturn as unknown as Organisation[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.organisation.create({
+        data,
+      });
+      organisations.push(createdItem);
+    })
+  );
 }

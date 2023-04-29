@@ -1,29 +1,35 @@
 import type { PrismaClient, Role } from "@prisma/client";
 import { AccessLevel } from "@prisma/client";
-import { uploadItems, userId } from "../utils";
+import { type UserId } from "../seed";
 
-export let roles: Role[];
+export const roles: Role[] = [];
 
-export async function uploadRoles(prisma: PrismaClient) {
+export async function uploadRoles(prisma: PrismaClient, userId: UserId) {
   const fakeData = [
     {
-      userId: userId.user,
+      userId: userId.user[0] || "",
       accessLevel: AccessLevel.USER,
     },
     {
-      userId: userId.organiser,
+      userId: userId.organiser[0] || "",
       accessLevel: AccessLevel.ORGANISER,
     },
     {
-      userId: userId.owner,
+      userId: userId.owner[0] || "",
       accessLevel: AccessLevel.OWNER,
     },
     {
-      userId: userId.admin,
+      userId: userId.admin[0] || "",
       accessLevel: AccessLevel.ADMIN,
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.role, fakeData);
-  roles = uploadReturn as Role[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.role.create({
+        data,
+      });
+      roles.push(createdItem);
+    })
+  );
 }

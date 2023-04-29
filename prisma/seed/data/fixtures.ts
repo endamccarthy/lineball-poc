@@ -2,9 +2,8 @@ import type { Fixture, PrismaClient } from "@prisma/client";
 import { competitions } from "./competitions";
 import { groups } from "./groups";
 import { teams } from "./teams";
-import { uploadItems } from "../utils";
 
-export let fixtures: Fixture[];
+export const fixtures: Fixture[] = [];
 
 export async function uploadFixtures(prisma: PrismaClient) {
   const fakeData = [
@@ -12,14 +11,14 @@ export async function uploadFixtures(prisma: PrismaClient) {
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[0]?.id } },
-      round: 1,
+      round: "one",
       teamA: { connect: { id: teams[0]?.id } },
       teamB: { connect: { id: teams[1]?.id } },
     },
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[0]?.id } },
-      round: 1,
+      round: "one",
       teamA: { connect: { id: teams[2]?.id } },
       teamB: { connect: { id: teams[3]?.id } },
     },
@@ -27,14 +26,14 @@ export async function uploadFixtures(prisma: PrismaClient) {
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[0]?.id } },
-      round: 2,
+      round: "two",
       teamA: { connect: { id: teams[0]?.id } },
       teamB: { connect: { id: teams[2]?.id } },
     },
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[0]?.id } },
-      round: 2,
+      round: "two",
       teamA: { connect: { id: teams[1]?.id } },
       teamB: { connect: { id: teams[3]?.id } },
     },
@@ -42,14 +41,14 @@ export async function uploadFixtures(prisma: PrismaClient) {
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[1]?.id } },
-      round: 1,
+      round: "one",
       teamA: { connect: { id: teams[4]?.id } },
       teamB: { connect: { id: teams[5]?.id } },
     },
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[1]?.id } },
-      round: 1,
+      round: "one",
       teamA: { connect: { id: teams[6]?.id } },
       teamB: { connect: { id: teams[7]?.id } },
     },
@@ -57,19 +56,25 @@ export async function uploadFixtures(prisma: PrismaClient) {
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[1]?.id } },
-      round: 1,
+      round: "two",
       teamA: { connect: { id: teams[4]?.id } },
       teamB: { connect: { id: teams[6]?.id } },
     },
     {
       competition: { connect: { id: competitions[0]?.id } },
       group: { connect: { id: groups[1]?.id } },
-      round: 1,
+      round: "two",
       teamA: { connect: { id: teams[5]?.id } },
       teamB: { connect: { id: teams[7]?.id } },
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.fixture, fakeData);
-  fixtures = uploadReturn as unknown as Fixture[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.fixture.create({
+        data,
+      });
+      fixtures.push(createdItem);
+    })
+  );
 }

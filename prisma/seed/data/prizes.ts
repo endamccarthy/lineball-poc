@@ -1,8 +1,7 @@
 import type { Prize, PrismaClient } from "@prisma/client";
-import { uploadItems } from "../utils";
 import { fundraisers } from "./fundraisers";
 
-export let prizes: Prize[];
+export const prizes: Prize[] = [];
 
 export async function uploadPrizes(prisma: PrismaClient) {
   const fakeData = [
@@ -23,6 +22,12 @@ export async function uploadPrizes(prisma: PrismaClient) {
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.prize, fakeData);
-  prizes = uploadReturn as unknown as Prize[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.prize.create({
+        data,
+      });
+      prizes.push(createdItem);
+    })
+  );
 }

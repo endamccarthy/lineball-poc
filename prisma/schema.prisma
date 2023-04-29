@@ -18,6 +18,11 @@ enum AccessLevel {
   OWNER
 }
 
+enum FixtureType {
+  GROUP
+  KNOCKOUT
+}
+
 enum Result {
   TEAM_A_WIN
   TEAM_B_WIN
@@ -37,6 +42,10 @@ enum Platform {
   TWITTER
 }
 
+// maybe no need for this table - use clerk public or private metadata instead
+// set an accessLevel variable when they sign up
+// change the accessLevel once their organisation is verifed
+// the organisers stripe key can be stored there too
 model Role {
   id          Int         @id @default(autoincrement())
   userId      String
@@ -45,7 +54,7 @@ model Role {
   organisations Organisation[]
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@unique([userId])
   @@index([userId])
@@ -55,42 +64,29 @@ model Team {
   id   Int    @id @default(autoincrement())
   name String @unique @db.VarChar(50)
 
-  fixturesA Fixture[] @relation("teamA")
-  fixturesB Fixture[] @relation("teamB")
+  fixturesA          Fixture[]    @relation("teamA")
+  fixturesB          Fixture[]    @relation("teamB")
+  winningPredictions Prediction[] @relation("winningTeam")
+  losingPredictions  Prediction[] @relation("losingTeam")
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
-}
-
-model Scoring {
-  id            Int @id @default(autoincrement())
-  pointsForWin  Int @db.TinyInt
-  pointsForDraw Int @db.TinyInt
-
-  competitions Competition[]
-
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model Competition {
-  id      Int     @id @default(autoincrement())
-  name    String  @db.VarChar(50)
-  year    Int     @db.Year
-  sport   Sport
-  scoring Scoring @relation(fields: [scoringId], references: [id])
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(50)
+  year  Int    @db.Year
+  sport Sport
 
   fundraisers Fundraiser[]
   fixtures    Fixture[]
   groups      Group[]
 
-  scoringId Int
-
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@unique([name, year])
-  @@index([scoringId])
 }
 
 model Group {
@@ -103,7 +99,7 @@ model Group {
   competitionId Int
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@unique([name, competitionId])
   @@index([competitionId])
@@ -112,10 +108,11 @@ model Group {
 model Fixture {
   id          Int         @unique @default(autoincrement())
   competition Competition @relation(fields: [competitionId], references: [id])
-  group       Group       @relation(fields: [groupId], references: [id])
-  round       Int         @default(1) @db.TinyInt
-  teamA       Team        @relation("teamA", fields: [teamAId], references: [id])
-  teamB       Team        @relation("teamB", fields: [teamBId], references: [id])
+  type        FixtureType @default(GROUP)
+  group       Group?      @relation(fields: [groupId], references: [id])
+  round       String      @db.VarChar(30)
+  teamA       Team?       @relation("teamA", fields: [teamAId], references: [id])
+  teamB       Team?       @relation("teamB", fields: [teamBId], references: [id])
   result      Result?
 
   predictions Prediction[]
@@ -126,7 +123,7 @@ model Fixture {
   groupId       Int
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@id([competitionId, round, teamAId, teamBId])
   @@index([id])
@@ -144,7 +141,7 @@ model Social {
   organisations Organisation[]
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@unique([platform, handle])
 }
@@ -158,7 +155,7 @@ model Organisation {
   fundraisers Fundraiser[]
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@index([name])
 }
@@ -177,7 +174,7 @@ model Fundraiser {
   organisationId Int
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@index([organiserId])
   @@index([competitionId])
@@ -194,7 +191,7 @@ model Prize {
   fundraiserId Int
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@unique([place, fundraiserId])
   @@index([fundraiserId])
@@ -211,25 +208,31 @@ model Entry {
   fundraiserId Int
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([fundraiserId])
 }
 
 model Prediction {
-  id      Int     @id @default(autoincrement())
-  entry   Entry   @relation(fields: [entryId], references: [id])
-  fixture Fixture @relation(fields: [fixtureId], references: [id])
-  result  Result
+  id          Int     @id @default(autoincrement())
+  entry       Entry   @relation(fields: [entryId], references: [id])
+  fixture     Fixture @relation(fields: [fixtureId], references: [id])
+  result      Result?
+  winningTeam Team?   @relation("winningTeam", fields: [winningTeamId], references: [id])
+  losingTeam  Team?   @relation("losingTeam", fields: [losingTeamId], references: [id])
 
-  entryId   Int
-  fixtureId Int
+  entryId       Int
+  fixtureId     Int
+  winningTeamId Int?
+  losingTeamId  Int?
 
   createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 
   @@unique([entryId, fixtureId])
   @@index([entryId])
   @@index([fixtureId])
+  @@index([winningTeamId])
+  @@index([losingTeamId])
 }

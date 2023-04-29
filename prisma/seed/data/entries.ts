@@ -1,25 +1,31 @@
 import type { Entry, PrismaClient } from "@prisma/client";
-import { uploadItems, userId } from "../utils";
 import { fundraisers } from "./fundraisers";
+import { type UserId } from "../seed";
 
-export let entries: Entry[];
+export const entries: Entry[] = [];
 
-export async function uploadEntries(prisma: PrismaClient) {
+export async function uploadEntries(prisma: PrismaClient, userId: UserId) {
   const fakeData = [
     {
-      userId: userId.user,
+      userId: userId.user[0] || "",
       fundraiser: { connect: { id: fundraisers[0]?.id } },
     },
     {
-      userId: userId.user,
+      userId: userId.user[0] || "",
       fundraiser: { connect: { id: fundraisers[0]?.id } },
     },
     {
-      userId: userId.user,
+      userId: userId.user[0] || "",
       fundraiser: { connect: { id: fundraisers[0]?.id } },
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.entry, fakeData);
-  entries = uploadReturn as unknown as Entry[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.entry.create({
+        data,
+      });
+      entries.push(createdItem);
+    })
+  );
 }

@@ -11,22 +11,34 @@ import { uploadRoles } from "./data/roles";
 import { uploadTeams } from "./data/teams";
 import { uploadPrizes } from "./data/prizes";
 import { uploadSocials } from "./data/socials";
-import { uploadScoring } from "./data/scoring";
 
 const prisma = new PrismaClient();
 
+export type UserId = {
+  user: string[];
+  organiser: string[];
+  admin: string[];
+  owner: string[];
+};
+
 async function main() {
-  await uploadRoles(prisma);
+  const userId: UserId = {
+    user: ["fake-user-id-1"],
+    organiser: ["fake-user-id-2"],
+    admin: ["fake-user-id-3"],
+    owner: ["fake-user-id-4"],
+  };
+
+  await uploadRoles(prisma, userId);
   await uploadTeams(prisma);
-  await uploadScoring(prisma);
   await uploadCompetitions(prisma);
   await uploadGroups(prisma);
   await uploadFixtures(prisma);
   await uploadSocials(prisma);
   await uploadOrganisations(prisma);
-  await uploadFundraisers(prisma);
+  await uploadFundraisers(prisma, userId);
   await uploadPrizes(prisma);
-  await uploadEntries(prisma);
+  await uploadEntries(prisma, userId);
   await uploadPredictions(prisma);
 }
 

@@ -1,19 +1,25 @@
 import type { Fundraiser, PrismaClient } from "@prisma/client";
-import { uploadItems, userId } from "../utils";
 import { competitions } from "./competitions";
 import { organisations } from "./organisations";
+import { type UserId } from "../seed";
 
-export let fundraisers: Fundraiser[];
+export const fundraisers: Fundraiser[] = [];
 
-export async function uploadFundraisers(prisma: PrismaClient) {
+export async function uploadFundraisers(prisma: PrismaClient, userId: UserId) {
   const fakeData = [
     {
-      organiserId: userId.organiser,
+      organiserId: userId.organiser[0] || "",
       competition: { connect: { id: competitions[0]?.id } },
       organisation: { connect: { id: organisations[0]?.id } },
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.fundraiser, fakeData);
-  fundraisers = uploadReturn as unknown as Fundraiser[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.fundraiser.create({
+        data,
+      });
+      fundraisers.push(createdItem);
+    })
+  );
 }

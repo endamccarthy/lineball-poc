@@ -1,8 +1,7 @@
 import type { Social, PrismaClient } from "@prisma/client";
 import { Platform } from "@prisma/client";
-import { uploadItems } from "../utils";
 
-export let socials: Social[];
+export const socials: Social[] = [];
 
 export async function uploadSocials(prisma: PrismaClient) {
   const fakeData = [
@@ -16,6 +15,12 @@ export async function uploadSocials(prisma: PrismaClient) {
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.social, fakeData);
-  socials = uploadReturn as Social[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.social.create({
+        data,
+      });
+      socials.push(createdItem);
+    })
+  );
 }

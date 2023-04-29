@@ -1,7 +1,6 @@
 import type { PrismaClient, Team } from "@prisma/client";
-import { uploadItems } from "../utils";
 
-export let teams: Team[];
+export const teams: Team[] = [];
 
 export async function uploadTeams(prisma: PrismaClient) {
   const fakeData = [
@@ -15,6 +14,12 @@ export async function uploadTeams(prisma: PrismaClient) {
     { name: "wexford" },
   ];
 
-  const uploadReturn = await uploadItems(prisma.team, fakeData);
-  teams = uploadReturn as Team[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.team.create({
+        data,
+      });
+      teams.push(createdItem);
+    })
+  );
 }

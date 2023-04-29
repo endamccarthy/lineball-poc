@@ -1,9 +1,8 @@
 import { Result, type Prediction, type PrismaClient } from "@prisma/client";
 import { entries } from "./entries";
 import { fixtures } from "./fixtures";
-import { uploadItems } from "../utils";
 
-export let predictions: Prediction[];
+export const predictions: Prediction[] = [];
 
 export async function uploadPredictions(prisma: PrismaClient) {
   const fakeData = [
@@ -39,6 +38,12 @@ export async function uploadPredictions(prisma: PrismaClient) {
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.prediction, fakeData);
-  predictions = uploadReturn as unknown as Prediction[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.prediction.create({
+        data,
+      });
+      predictions.push(createdItem);
+    })
+  );
 }

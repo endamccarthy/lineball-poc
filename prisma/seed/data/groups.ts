@@ -1,8 +1,7 @@
 import type { PrismaClient, Group } from "@prisma/client";
 import { competitions } from "./competitions";
-import { uploadItems } from "../utils";
 
-export let groups: Group[];
+export const groups: Group[] = [];
 
 export async function uploadGroups(prisma: PrismaClient) {
   const fakeData = [
@@ -16,6 +15,12 @@ export async function uploadGroups(prisma: PrismaClient) {
     },
   ];
 
-  const uploadReturn = await uploadItems(prisma.group, fakeData);
-  groups = uploadReturn as unknown as Group[];
+  await Promise.all(
+    fakeData.map(async (data) => {
+      const createdItem = await prisma.group.create({
+        data,
+      });
+      groups.push(createdItem);
+    })
+  );
 }
