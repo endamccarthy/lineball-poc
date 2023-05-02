@@ -19,7 +19,7 @@ const config = {
     defaultLocale: "en",
   },
   images: {
-    domains: ["images.clerk.dev"],
+    domains: ["images.clerk.dev", "tailwindui.com", "images.unsplash.com"],
   },
 
   // Following were added to ignore typechecking and linting on vercel as we have that in GH CI now

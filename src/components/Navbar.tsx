@@ -1,130 +1,251 @@
-import Image from "next/image";
-import React, { useState } from "react";
-import logo_light from "../../public/logo_light.png";
+import { Disclosure } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import {
-  AiOutlineMenu,
-  AiOutlineClose,
-  AiOutlineInstagram,
-  AiOutlineFacebook,
-  AiOutlineTwitter,
-} from "react-icons/ai";
 
-const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+// function classNames(...classes: string[]) {
+//   return classes.filter(Boolean).join(" ");
+// }
 
-  const handleNav = () => {
-    setMenuOpen(!menuOpen);
-  };
-
+export default function Navbar() {
   return (
-    <nav className="fixed h-24 w-full bg-indigo-800 text-stone-100 shadow-xl">
-      <div className="flex h-full w-full items-center justify-between px-4 2xl:px-16">
-        <Link href={"/"}>
-          <Image
-            src={logo_light}
-            alt="Logo"
-            width="155"
-            className="cursor-pointer bg-red-600"
-            priority
-          />
-        </Link>
-        <div className="text-md bg-red-400">
-          <ul className="hidden sm:flex">
-            <Link href={"/about"}>
-              <li className="ml-10 uppercase hover:border-b">Organisations</li>
-            </Link>
-            <Link href={"/contact"}>
-              <li className="ml-10 uppercase hover:border-b">Contact Us</li>
-            </Link>
-            <Link href={"/services"}>
-              <li className="ml-10 uppercase hover:border-b">Services</li>
-            </Link>
-            <Link href={"/blog"}>
-              <li className="ml-10 uppercase hover:border-b">Blog</li>
-            </Link>
-          </ul>
-        </div>
-        <div
-          onClick={handleNav}
-          className="cursor-pointer bg-red-400 sm:hidden"
-        >
-          <AiOutlineMenu size={30} />
-        </div>
-      </div>
-      <div
-        className={
-          menuOpen
-            ? "fixed left-0 top-[-24] h-screen w-full bg-indigo-700 bg-opacity-90 p-8 duration-200 ease-in sm:hidden"
-            : "fixed left-[-100%] top-[-24] h-screen p-8 duration-100 ease-in"
-        }
-      >
-        <div className="flex w-full items-center justify-end">
-          <div onClick={handleNav} className="cursor-pointer">
-            <AiOutlineClose size={25} />
+    <Disclosure as="nav" className="sticky top-0 z-50 bg-white shadow ">
+      {({ open }) => (
+        <>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 justify-between">
+              <div className="flex">
+                <div className="flex flex-shrink-0 items-center">
+                  {/* <Image
+                    className="h-34 block w-auto lg:hidden"
+                    src={logoOrange}
+                    alt="Lineball"
+                    width={100}
+                    height={100}
+                    priority
+                  />
+                  <Image
+                    className="h-34 hidden w-auto lg:block"
+                    src={logoOrange}
+                    alt="Lineball"
+                    width={100}
+                    height={100}
+                    priority
+                  /> */}
+                  <Link
+                    href="/"
+                    className="inline-flex items-center px-5 text-2xl font-semibold text-orange-500"
+                  >
+                    Lineball
+                  </Link>
+                </div>
+                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                  {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
+                  <Link
+                    href="/"
+                    className="inline-flex items-center border-b-2 border-indigo-500 px-1 pt-1 text-sm font-medium text-gray-900"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    href="/fundraisers"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  >
+                    Fundraisers
+                  </Link>
+                  <Link
+                    href="/about"
+                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  >
+                    About
+                  </Link>
+                </div>
+              </div>
+              {/* <div className="sm:ml-6 sm:flex sm:items-center">
+                <button
+                  type="button"
+                  className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  <span className="sr-only">View notifications</span>
+                  <BellIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
+
+                <Menu as="div" className="relative ml-3">
+                  <div>
+                    <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                      <span className="sr-only">Open user menu</span>
+                      <Image
+                        className="h-8 w-8 rounded-full"
+                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                        alt=""
+                        width={10}
+                        height={10}
+                      />
+                    </Menu.Button>
+                  </div>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <a
+                            href="#"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Your Profile
+                          </a>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <a
+                            href="#"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Settings
+                          </a>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <a
+                            href="#"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Sign out
+                          </a>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
+              </div> */}
+              <div className="-mr-2 flex items-center gap-2">
+                {/* Mobile menu button */}
+                <div>
+                  <SignedIn>
+                    <UserButton
+                      appearance={{ variables: { colorPrimary: "#6366f1" } }}
+                    />
+                  </SignedIn>
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <button className="rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                        Sign in
+                      </button>
+                    </SignInButton>
+                  </SignedOut>
+                </div>
+                <div className="sm:hidden">
+                  {" "}
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="flex-col py-4 text-lg">
-          <ul>
-            <Link href={"/"}>
-              <li
-                onClick={() => setMenuOpen(false)}
-                className="cursor-pointer py-4"
+
+          <Disclosure.Panel className="sm:hidden">
+            <div className="space-y-1 pb-3 pt-2">
+              {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
+              <Disclosure.Button
+                as="a"
+                href="/"
+                className="block border-l-4 border-indigo-500 bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium text-indigo-700"
               >
                 Home
-              </li>
-            </Link>
-            <Link href={"/about"}>
-              <li
-                onClick={() => setMenuOpen(false)}
-                className="cursor-pointer py-4"
+              </Disclosure.Button>
+              <Disclosure.Button
+                as="a"
+                href="/fundraisers"
+                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
+              >
+                Fundraisers
+              </Disclosure.Button>
+              <Disclosure.Button
+                as="a"
+                href="/about"
+                className="block border-l-4 border-transparent py-2 pl-3 pr-4 text-base font-medium text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
               >
                 About
-              </li>
-            </Link>
-            <Link href={"/contact"}>
-              <li
-                onClick={() => setMenuOpen(false)}
-                className="cursor-pointer py-4"
-              >
-                Contact
-              </li>
-            </Link>
-            <Link href={"/services"}>
-              <li
-                onClick={() => setMenuOpen(false)}
-                className="cursor-pointer py-4"
-              >
-                Services
-              </li>
-            </Link>
-            <Link href={"/blog"}>
-              <li
-                onClick={() => setMenuOpen(false)}
-                className="cursor-pointer py-4"
-              >
-                Blog
-              </li>
-            </Link>
-          </ul>
-        </div>
-        <div className="flex flex-row items-center justify-around pt-10">
-          <AiOutlineInstagram size={30} className="cursor-pointer" />
-          <AiOutlineTwitter size={30} className="cursor-pointer" />
-          <AiOutlineFacebook size={30} className="cursor-pointer" />
-        </div>
-        <Link href={"/"}>
-          <Image
-            src={logo_light}
-            alt="Logo"
-            width="205"
-            className="cursor-pointer pt-2"
-            priority
-          />
-        </Link>
-      </div>
-    </nav>
+              </Disclosure.Button>
+            </div>
+            {/* <div className="border-t border-gray-200 pb-3 pt-4">
+              <div className="flex items-center px-4">
+                <div className="flex-shrink-0">
+                  <Image
+                    className="h-10 w-10 rounded-full"
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
+                </div>
+                <div className="ml-3">
+                  <div className="text-base font-medium text-gray-800">
+                    Tom Cook
+                  </div>
+                  <div className="text-sm font-medium text-gray-500">
+                    tom@example.com
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="ml-auto flex-shrink-0 rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  <span className="sr-only">View notifications</span>
+                  <BellIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
+              <div className="mt-3 space-y-1">
+                <Disclosure.Button
+                  as="a"
+                  href="#"
+                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                >
+                  Your Profile
+                </Disclosure.Button>
+                <Disclosure.Button
+                  as="a"
+                  href="#"
+                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                >
+                  Settings
+                </Disclosure.Button>
+                <Disclosure.Button
+                  as="a"
+                  href="#"
+                  className="block px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                >
+                  Sign out
+                </Disclosure.Button>
+              </div>
+            </div> */}
+          </Disclosure.Panel>
+        </>
+      )}
+    </Disclosure>
   );
-};
-
-export default Navbar;
+}
