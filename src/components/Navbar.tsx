@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "Fundraisers", href: "/fundraisers" },
+  { name: "Fundraiser", href: "/gortnahoe-glengoole-gaa/championship-challenge-2024" },
   { name: "About", href: "/about" },
 ];
 
@@ -18,7 +18,7 @@ export default function Navbar() {
   const pathname = usePathname();
 
   return (
-    <Disclosure as="nav" className="sticky top-0 z-50 bg-white shadow">
+    <Disclosure as="nav" className="sticky top-0 z-50 bg-stone-50 shadow">
       {({ open }) => (
         <>
           {/* Desktop */}
